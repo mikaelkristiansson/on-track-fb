@@ -60,7 +60,7 @@ app.post('/exercises', function(req, res) {
 app.get('/exercises', function(req, res) {
   const date = req.query.date + '-01-01';
   let query = admin.database().ref(`/users/${req.user.uid}/exercises`);
-  if(date) {
+  if(req.query.date) {
     const startOfYear = moment(date).startOf('year').format('YYYY-MM-DD');
     const endOfYear = moment(date).endOf('year').format('YYYY-MM-DD');
     query = query.orderByChild('createdAt').startAt(startOfYear).endAt(endOfYear);
