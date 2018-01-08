@@ -40,11 +40,12 @@ app.use(authenticate);
 // Create a new exercise
 app.post('/exercises', function(req, res) {
   const type = req.body.type;
+  const createdAt = req.body.created_at ? req.body.created_at : moment().format('YYYY-MM-DD HH:mm:ss');
   const user = req.user;
   const data = {
     user: user.uid,
     type: type,
-    createdAt: moment().format('YYYY-MM-DD HH:mm:ss'),//admin.database.ServerValue.TIMESTAMP,
+    createdAt: createdAt,//admin.database.ServerValue.TIMESTAMP,
     updatedAt: null,
     deletedAt: null
   };
