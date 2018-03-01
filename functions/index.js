@@ -95,7 +95,7 @@ app.get('/exercises/total', function(req,res) {
   let query = admin.database().ref(`/users/${req.user.uid}/exercises`);
 
   const startOfYear = moment().startOf('year').format('YYYY-MM-DD');
-  const startOfLastYear = moment().subtract(1, ‘year’).startOf('year').format('YYYY-MM-DD');
+  const startOfLastYear = moment().subtract(1, 'year').startOf('year').format('YYYY-MM-DD');
   const endOfYear = moment().endOf('year').format('YYYY-MM-DD');
 
   query = query.orderByChild('createdAt').startAt(startOfLastYear).endAt(endOfYear);
