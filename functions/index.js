@@ -79,6 +79,57 @@ app.get('/exercises', function(req, res) {
   });
 });
 
+/**
+{
+“last_month”: 20,
+“last_six_months”: 40,
+“this_year”: 95
+}
+*/
+app.get('/exercises/total', function(req,res) {
+  let lastMonth =  moment().subtract(1, 'months');
+  let startM = moment(lastMonth.startOf('month')).format('YYYY-MM-DD');
+  let endM = moment(lastMonth.endOf('month')).format('YYYY-MM-DD');
+  let sixMonthsAgo = moment().subtract(6, 'months');
+
+  let query = admin.database().ref(`/users/${req.user.uid}/exercises`);
+
+  const startOfYear = moment().startOf('year').format('YYYY-MM-DD');
+  const startOfLastYear = moment().subtract(1, ‘year’).startOf('year').format('YYYY-MM-DD');
+  const endOfYear = moment().endOf('year').format('YYYY-MM-DD');
+
+  query = query.orderByChild('createdAt').startAt(startOfLastYear).endAt(endOfYear);
+
+  query.once('value').then(snapshot => { 
+    let countLM = 0,
+        countSM = 0,
+        countTY = 0;
+    snapshot.forEach(childSnapshot => { 
+      let CA = childSnapshot.createdAt;
+      // LAST MONTH
+      if(CA.isBetween(startM, endM, 'days', true)) {
+        countLM++;
+      }
+      // LAST 6 MONTHS
+      if(CA.isAfter(moment(sixMonthsAgo.startOf('month')).format('YYYY-MM-DD'))) {
+        countSM++;
+      }
+      // THIS YEAR
+      if(CA.isBetween(startOfYear, endOfYear, 'days', true)) {
+        countTY++;
+      }
+    });
+    let result = {
+      'last_month': countLM,
+      'last_six_months': countSM,
+      'this_year': countTY
+    };
+    return res.status(200).json(result); 
+  }).catch(error => { 
+    console.log('Error getting messages', error.message); 
+    res.sendStatus(500); 
+  });
+});
 // Middleware to catch 404 errors
 // app.use(function(req, res) {
 //   res.status(404).send({message: 'api route not found'});
