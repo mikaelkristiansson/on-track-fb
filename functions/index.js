@@ -87,16 +87,17 @@ app.get('/exercises', function(req, res) {
 }
 */
 app.get('/exercises/total', function(req,res) {
+  let format = 'YYYY-MM-DD';
   let lastMonth =  moment().subtract(1, 'months');
-  let startM = moment(lastMonth.startOf('month')).format('YYYY-MM-DD');
-  let endM = moment(lastMonth.endOf('month')).format('YYYY-MM-DD');
+  let startM = moment(lastMonth.startOf('month')).format(format);
+  let endM = moment(lastMonth.endOf('month')).format(format);
   let sixMonthsAgo = moment().subtract(6, 'months');
 
   let query = admin.database().ref(`/users/${req.user.uid}/exercises`);
 
-  const startOfYear = moment().startOf('year').format('YYYY-MM-DD');
-  const startOfLastYear = moment().subtract(1, 'year').startOf('year').format('YYYY-MM-DD');
-  const endOfYear = moment().endOf('year').format('YYYY-MM-DD');
+  const startOfYear = moment().startOf('year').format(format);
+  const startOfLastYear = moment().subtract(1, 'years').startOf('year').format(format);
+  const endOfYear = moment().endOf('year').format(format);
 
   query = query.orderByChild('createdAt').startAt(startOfLastYear).endAt(endOfYear);
 
@@ -105,17 +106,17 @@ app.get('/exercises/total', function(req,res) {
         countSM = 0,
         countTY = 0;
     snapshot.forEach(childSnapshot => { 
-      let CA = childSnapshot.createdAt;
+      let CA = moment(childSnapshot.val().createdAt, format);
       // LAST MONTH
-      if(CA.isBetween(startM, endM, 'days', true)) {
+      if(moment(CA).isBetween(startM, endM, 'days', true)) {
         countLM++;
       }
       // LAST 6 MONTHS
-      if(CA.isAfter(moment(sixMonthsAgo.startOf('month')).format('YYYY-MM-DD'))) {
+      if(moment(CA).isBetween(moment(sixMonthsAgo.startOf('month')).format(format), moment().format(format), 'days', true)) {
         countSM++;
       }
       // THIS YEAR
-      if(CA.isBetween(startOfYear, endOfYear, 'days', true)) {
+      if(moment(CA).isBetween(startOfYear, endOfYear, 'days', true)) {
         countTY++;
       }
     });

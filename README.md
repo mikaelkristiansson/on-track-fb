@@ -14,7 +14,7 @@ Only users who pass a valid Firebase ID token as a Bearer token in the
 ## Deploy and test
 To test locally do:
 
-  1. Start serving your project locally using `firebase serve --functions`
+  1. Start serving your project locally using `firebase serve --only functions`
 
 To deploy and test on prod do:
 
